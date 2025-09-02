@@ -9,7 +9,7 @@ namespace ProyectoFichaMedica.Models
     {
         [Key]
         public int Id { get; set; }
-
+        /*se crean las reglas y restricciones para el ingreso de datos en los campos*/
         [Required(ErrorMessage = "El RUT es un campo obligatorio.")]
         [Display(Name = "RUT del Paciente")]
         [StringLength(12)]
@@ -36,23 +36,28 @@ namespace ProyectoFichaMedica.Models
         [StringLength(100)]
         [RegularExpression(@"^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$", ErrorMessage = "La ciudad solo puede contener letras y espacios.")]
         public string Ciudad { get; set; } = string.Empty;
-
+        
+        /*se agregan reglas de formato para numero de telefono con codigo pais*/
         [Required(ErrorMessage = "El teléfono es un campo obligatorio.")]
         [StringLength(12, MinimumLength = 12, ErrorMessage = "El teléfono debe tener 12 caracteres (ej: +56912345678).")]
         [RegularExpression(@"^\+569\d{8}$", ErrorMessage = "El formato debe ser +569 seguido de 8 dígitos.")]
         [Display(Name = "Teléfono")]
         public string Telefono { get; set; } = string.Empty;
 
+        /*restricciones para campo Email*/
         [Required(ErrorMessage = "El email es un campo obligatorio.")]
         [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "El formato del email no es válido.")]
         [StringLength(100)]
         public string Email { get; set; } = string.Empty;
 
+        /*se agrega regla al calendario de formulario para que muestre la fecha actual ya que el que viene por defecto es 1/1/0001
+        y era una falla de diseño llegar hasta fechas mas cercanas como 199x*/
         [Required(ErrorMessage = "La fecha de nacimiento es obligatoria.")]
         [DataType(DataType.Date)]
         [Display(Name = "Fecha de Nacimiento")]
         public DateTime FechaNacimiento { get; set; } = DateTime.Now;
 
+        /*campos de seleccion multiple*/
         [Required(ErrorMessage = "Debe seleccionar una opción para el sexo.")]
         public string Sexo { get; set; } = string.Empty;
 

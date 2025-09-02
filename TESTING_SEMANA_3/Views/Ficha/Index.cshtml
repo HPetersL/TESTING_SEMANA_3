@@ -3,27 +3,29 @@
 
 @{
     ViewData["Title"] = "Gestión de Ficha Médica";
-    // Recuperamos los datos de una ficha que colisionó para no perderlos y poder mostrarlos en el formulario de confirmación.
     var fichaExistenteJson = TempData["FichaExistente"] as string;
     FichaMedica? fichaExistente = !string.IsNullOrEmpty(fichaExistenteJson) ? JsonSerializer.Deserialize<FichaMedica>(fichaExistenteJson) : null;
 }
-
+//efecto visual de cuadros con error
 <style>
     .input-error {
         border-color: #dc3545; /*color para bordes con datos incorrectos o null*/
-        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25); /*sombreado*/
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25); /*sombreado rojo para input*/
     }
 </style>
 
+//titulo de vista dinamico
 <h1>@ViewData["Title"]</h1>
 <hr />
 
+//mensaje de exito
 @if (TempData["MensajeExito"] != null)
 {
     <div class="alert alert-success" role="alert">
         @TempData["MensajeExito"]
     </div>
 }
+//mensaje de alerta si existen datos y ficha para sobreescritura
 @if (TempData["MensajeAlerta"] != null && fichaExistente != null)
 {
     <div class="alert alert-warning" role="alert">
@@ -41,6 +43,7 @@
             <input type="hidden" asp-for="@fichaExistente.EstadoCivil" />
             <input type="hidden" asp-for="@fichaExistente.Comentarios" />
 
+            //preguntar a usuario si desea sobreescribir
             <input type="hidden" name="sobrescribir" value="si" />
             <button type="submit" class="btn btn-sm btn-success">Sí, Sobrescribir</button>
             <a asp-action="Index" class="btn btn-sm btn-danger">No, Cancelar</a>
@@ -48,39 +51,45 @@
     </div>
 }
 
-
+//botones para post
 <div class="row">
     <div class="col-md-6">
         <h4>Ingresar o Modificar Registro</h4>
         <form asp-action="Guardar" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+//campo para rut y mensaje de error
             <div class="form-group mb-2">
                 <label asp-for="@(new FichaMedica().Rut)" class="control-label"></label>
                 <input asp-for="@(new FichaMedica().Rut)" class="form-control" title="Ingrese RUT sin puntos y con guión (ej: 12345678-K)." />
                 <span asp-validation-for="@(new FichaMedica().Rut)" class="text-danger"></span>
             </div>
+//campo para nombre con validacion de letras y espacios
             <div class="form-group mb-2">
                 <label asp-for="@(new FichaMedica().Nombres)" class="control-label"></label>
                 <input asp-for="@(new FichaMedica().Nombres)" class="form-control"
                        title="Este campo solo admite letras y espacios." />
                 <span asp-validation-for="@(new FichaMedica().Nombres)" class="text-danger"></span>
             </div>
+//campo para apellidos con letras y espacios
             <div class="form-group mb-2">
                 <label asp-for="@(new FichaMedica().Apellidos)" class="control-label"></label>
                 <input asp-for="@(new FichaMedica().Apellidos)" class="form-control" title="Este campo solo admite letras y espacios." />
                 <span asp-validation-for="@(new FichaMedica().Apellidos)" class="text-danger"></span>
             </div>
+//campo de ingreso direccion
             <div class="form-group mb-2">
                 <label asp-for="@(new FichaMedica().Direccion)" class="control-label"></label>
                 <input asp-for="@(new FichaMedica().Direccion)" class="form-control" title="Ingrese una dirección valida." />
                 <span asp-validation-for="@(new FichaMedica().Direccion)" class="text-danger"></span>
             </div>
+//campor para ingresar ciudad, letras y espacios
             <div class="form-group mb-2">
                 <label asp-for="@(new FichaMedica().Ciudad)" class="control-label"></label>
                 <input asp-for="@(new FichaMedica().Ciudad)" class="form-control" title="Este campo solo admite letras y espacios." />
                 <span asp-validation-for="@(new FichaMedica().Ciudad)" class="text-danger"></span>
             </div>
+// campor para ingresar telefono con formato y placeholder de guia
             <div class="form-group mb-2">
                 <label asp-for="@(new FichaMedica().Telefono)" class="control-label"></label>
                 <input asp-for="@(new FichaMedica().Telefono)" class="form-control"
@@ -88,17 +97,20 @@
                        title="Ingrese el teléfono en formato +569xxxxxxxx." />
                 <span asp-validation-for="@(new FichaMedica().Telefono)" class="text-danger"></span>
             </div>
+// campo para ingresar Email con validacion
             <div class="form-group mb-2">
                 <label asp-for="@(new FichaMedica().Email)" class="control-label"></label>
                 <input asp-for="@(new FichaMedica().Email)" class="form-control" title="Ingrese un email valido." />
                 <span asp-validation-for="@(new FichaMedica().Email)" class="text-danger"></span>
             </div>
+//campo para ingresar fecha de nacimiento con restriccion de fecha maxima ( no se puede nacer mañana)
             <div class="form-group mb-2">
                 <label asp-for="@(new FichaMedica().FechaNacimiento)" class="control-label"></label>
                 <input asp-for="@(new FichaMedica().FechaNacimiento)" class="form-control"
                        max="@DateTime.Now.ToString("yyyy-MM-dd")" />
                 <span asp-validation-for="@(new FichaMedica().FechaNacimiento)" class="text-danger"></span>
             </div>
+//selector de sexo con opciones
             <div class="form-group mb-2">
                 <label asp-for="@(new FichaMedica().Sexo)" class="control-label"></label>
                 <select asp-for="@(new FichaMedica().Sexo)" class="form-control" title="Seleccione una opción.">
@@ -109,6 +121,7 @@
                 </select>
                 <span asp-validation-for="@(new FichaMedica().Sexo)" class="text-danger"></span>
             </div>
+//selector de estado civil con opciones
             <div class="form-group mb-2">
                 <label asp-for="@(new FichaMedica().EstadoCivil)" class="control-label"></label>
                 <select asp-for="@(new FichaMedica().EstadoCivil)" class="form-control">
@@ -119,12 +132,13 @@
                 </select>
                 <span asp-validation-for="@(new FichaMedica().EstadoCivil)" class="text-danger"></span>
             </div>
+//campo comentarios 
             <div class="form-group mb-2">
                 <label asp-for="@(new FichaMedica().Comentarios)" class="control-label"></label>
                 <textarea asp-for="@(new FichaMedica().Comentarios)" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="@(new FichaMedica().Comentarios)" class="text-danger"></span>
             </div>
-
+// accion de botones guardar, limpiar y cerrar
             <div class="form-group mt-4">
                 <button type="submit" class="btn btn-primary">Guardar</button>
                 <a asp-action="Index" class="btn btn-secondary">Limpiar</a>
@@ -133,6 +147,7 @@
         </form>
     </div>
 
+//formulario de busqueda y filtro por apellido
     <div class="col-md-6">
         <h4>Buscar por Apellido</h4>
         <form asp-action="Index" method="get" class="mb-3">
@@ -141,7 +156,7 @@
                 <button class="btn btn-outline-secondary" type="submit">Buscar</button>
             </div>
         </form>
-
+ // si existe registro se muestra en tabla
         @if (Model != null && Model.Any())
         {
             <table class="table table-striped table-hover">
@@ -164,6 +179,7 @@
                 </tbody>
             </table>
         }
+//si no hay registros se muestra mensaje de null
         else if (ViewData["ApellidoBusquedaActual"] != null)
         {
             <p>No se encontraron registros con el apellido proporcionado.</p>
@@ -171,10 +187,12 @@
     </div>
 </div>
 
+//script para botones y formatos en tiempo real
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+//boton cerrar cierra la pestaña actual
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var btnCerrar = document.getElementById('btnCerrar');
@@ -185,60 +203,44 @@
                     }
                 });
             }
-            // nueva funcion para validar el rut chileno completamente
-            function validaRutChileno(rut) {
-                if (!rut || typeof rut !== 'string') return false;
-                
-                // limpiar y normalizar rut
-                rut = rut.toUpperCase().replace(/\./g, '').replace(/-/g, '');
-                
-                if (!/^\d{7,8}[0-9K]$/.test(rut)) return false;
 
-                const cuerpo = rut.slice(0, -1);
-                const dv = rut.slice(-1);
-                
-                let suma = 0;
-                let multiplo = 2;
-
-                for (let i = cuerpo.length - 1; i >= 0; i--) {
-                    suma += parseInt(cuerpo.charAt(i), 10) * multiplo;
-                    if (multiplo < 7) {
-                        multiplo++;
-                    } else {
-                        multiplo = 2;
-                    }
-                }
-
-                const dvEsperado = 11 - (suma % 11);
-                const dvCalculado = (dvEsperado === 11) ? '0' : (dvEsperado === 10) ? 'K' : dvEsperado.toString();
-
-                return dv === dvCalculado;
-            }
-
+//formato para rut en tiempo real
             var rutInput = document.querySelector('input[name="@nameof(FichaMedica.Rut)"]');
-            if(rutInput) {
-                rutInput.addEventListener('input', function(e) {
-                    const input = e.target;
-                    
-                    // Formatear la entrada visualmente (esto no cambia)
-                    let valorActual = input.value.replace(/[^\dKk]/g, '').toUpperCase();
-                    if (valorActual.length > 1) {
-                        let cuerpo = valorActual.slice(0, -1);
-                        let dv = valorActual.slice(-1);
-                        cuerpo = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                        input.value = cuerpo + '-' + dv;
-                    } else {
-                        input.value = valorActual;
+                    if(rutInput) {
+                        rutInput.addEventListener('input', function(e) {
+                            const input = e.target;
+
+                            // limpiar la entrada a solo números y K, no se permiten otros simbolos y letras
+                            let valorLimpio = input.value.replace(/[^\dKk]/g, '');
+
+                            // validar la estructura en tiempo real
+                            // La estructura válida es: hasta 8 dígitos, seguidos opcionalmente por un dígito o K.
+                            let estructuraValida = /^\d{0,8}[Kk\d]?$/.test(valorLimpio);
+
+                            if (input.value.length > 0 && !estructuraValida) {
+                                // vista error si no respeta estructura
+                                input.classList.add('input-error');
+                            } else {
+                                // remover error si campo vacio o formato correcto
+                                input.classList.remove('input-error');
+                            }
+
+                            // aplicar formato al campo
+                            if (valorLimpio.length > 1) {
+                                let cuerpo = valorLimpio.slice(0, -1);
+                                let dv = valorLimpio.slice(-1);
+
+                                // insercion de puntos
+                                cuerpo = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+                                input.value = cuerpo + '-' + dv;
+                            } else {
+                                input.value = valorLimpio;
+                            }
+                        });
                     }
 
-                    // Validar en tiempo real con el algoritmo completo
-                    if (input.value.length > 0 && !validaRutChileno(input.value)) {
-                        input.classList.add('input-error');
-                    } else {
-                        input.classList.remove('input-error');
-                    }
-                });
-            }
+     // Validación en tiempo real de campos de texto (solo letras y espacios)
             const soloLetrasPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/;
 
             const camposParaValidar = document.querySelectorAll(
@@ -262,6 +264,7 @@
                 input.addEventListener('input', validarCampoEnTiempoReal);
             });
 
+           // Validación en tiempo real de Teléfono (solo números y símbolo + inicial)
             const telefonoInput = document.querySelector('input[name="@nameof(FichaMedica.Telefono)"]');
             if (telefonoInput) {
                 const soloNumerosYMasPattern = /^\+?[0-9]*$/;
