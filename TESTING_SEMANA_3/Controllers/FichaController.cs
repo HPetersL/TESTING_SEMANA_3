@@ -39,7 +39,7 @@ namespace ProyectoFichaMedica.Controllers
             return View(await fichasQuery.ToListAsync());
         }
 
-        // 3. ACCION GUARDAR (POST): Procesa los datos del formulario
+        // ACCION GUARDAR (POST): Procesa los datos del formulario
         // esta accion se ejecuta cuando el usuario presione el botón "Guardar".
         [HttpPost]
         [ValidateAntiForgeryToken] // medida de seguridad por modificacion de datos
