@@ -204,43 +204,64 @@
                 });
             }
 
-//formato para rut en tiempo real
-            var rutInput = document.querySelector('input[name="@nameof(FichaMedica.Rut)"]');
-                    if(rutInput) {
-                        rutInput.addEventListener('input', function(e) {
-                            const input = e.target;
+            //formato para rut en tiempo real
+            function validaRutChileno(rut) {
+                if (!rut || typeof rut !== 'string') return false;
+    
+             // Limpiar y normalizar
+            rut = rut.toUpperCase().replace(/\./g, '').replace(/-/g, '');
+    
+            if (!/^\d{7,8}[0-9K]$/.test(rut)) return false; // formato basico   
 
-                            // limpiar la entrada a solo números y K, no se permiten otros simbolos y letras
-                            let valorLimpio = input.value.replace(/[^\dKk]/g, '');
+            // separar cuerpo y digito verificador
+            const cuerpo = rut.slice(0, -1);
+            const dv = rut.slice(-1);
+    
+            let suma = 0;
+            let multiplo = 2;
+            // calculo del digito verificador en tiempo real
+            for (let i = cuerpo.length - 1; i >= 0; i--) {
+                suma += parseInt(cuerpo.charAt(i), 10) * multiplo;
+                if (multiplo < 7) {
+                    multiplo++;
+                } else {
+                    multiplo = 2;
+                }
+            }
 
-                            // validar la estructura en tiempo real
-                            // La estructura válida es: hasta 8 dígitos, seguidos opcionalmente por un dígito o K.
-                            let estructuraValida = /^\d{0,8}[Kk\d]?$/.test(valorLimpio);
+            const dvEsperado = 11 - (suma % 11);
+            const dvCalculado = (dvEsperado === 11) ? '0' : (dvEsperado === 10) ? 'K' : dvEsperado.toString();
 
-                            if (input.value.length > 0 && !estructuraValida) {
-                                // vista error si no respeta estructura
-                                input.classList.add('input-error');
-                            } else {
-                                // remover error si campo vacio o formato correcto
-                                input.classList.remove('input-error');
-                            }
+            return dv === dvCalculado;
+        }
 
-                            // aplicar formato al campo
-                            if (valorLimpio.length > 1) {
-                                let cuerpo = valorLimpio.slice(0, -1);
-                                let dv = valorLimpio.slice(-1);
+        var rutInput = document.querySelector('input[name="@nameof(FichaMedica.Rut)"]');
+        if(rutInput) {
+            rutInput.addEventListener('input', function(e) {
+                const input = e.target;
+        
+                // formatear la entrada visualmente
+                let valorActual = input.value.replace(/[^\dKk]/g, '').toUpperCase();
+                if (valorActual.length > 1) {
+                    let cuerpo = valorActual.slice(0, -1);
+                    let dv = valorActual.slice(-1);
+                    cuerpo = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                    input.value = cuerpo + '-' + dv;
+                } else {
+                    input.value = valorActual;
+                }
 
-                                // insercion de puntos
-                                cuerpo = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                // validar en tiempo real con el algoritmo completo
+                if (input.value.length > 0 && !validaRutChileno(input.value)) {
+                    input.classList.add('input-error');
+                } else {
+                    input.classList.remove('input-error');
+                }
+            });
+        }
 
-                                input.value = cuerpo + '-' + dv;
-                            } else {
-                                input.value = valorLimpio;
-                            }
-                        });
-                    }
 
-     // Validación en tiempo real de campos de texto (solo letras y espacios)
+     // validaciion en tiempo real de campos de texto (solo letras y espacios)
             const soloLetrasPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/;
 
             const camposParaValidar = document.querySelectorAll(
@@ -264,7 +285,7 @@
                 input.addEventListener('input', validarCampoEnTiempoReal);
             });
 
-           // Validación en tiempo real de Teléfono (solo números y símbolo + inicial)
+           // Validacion en tiempo real de Telefono (solo numeros y simbolo + inicial)
             const telefonoInput = document.querySelector('input[name="@nameof(FichaMedica.Telefono)"]');
             if (telefonoInput) {
                 const soloNumerosYMasPattern = /^\+?[0-9]*$/;
@@ -278,6 +299,6 @@
                         }
                 });
         }
-        });
+
     </script>
 }

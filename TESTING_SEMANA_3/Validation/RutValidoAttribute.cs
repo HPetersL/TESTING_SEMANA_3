@@ -8,17 +8,18 @@ namespace ProyectoFichaMedica.Validation
         {
             if (value is not string rut || string.IsNullOrEmpty(rut))
             {
-                return ValidationResult.Success; 
+                return ValidationResult.Success; // comprobacion de null o vacio se maneja con [Required]
             }
 
             try
             {
+                // limpiar formato del RUT
                 rut = rut.ToUpper().Replace(".", "").Replace("-", "");
 
                 string cuerpo = rut.Substring(0, rut.Length - 1);
                 char dv = rut[rut.Length - 1];
 
-                //modulo 11
+                // modulo 11 para calcular digito verificador
                 int suma = 0;
                 int multiplo = 2;
 
@@ -34,7 +35,7 @@ namespace ProyectoFichaMedica.Validation
                         multiplo = 2;
                     }
                 }
-
+                // calculo para obtener digito verificador esperado
                 int digitoEsperado = 11 - (suma % 11);
                 string dvEsperado = digitoEsperado.ToString();
 
@@ -58,6 +59,7 @@ namespace ProyectoFichaMedica.Validation
             }
             catch (Exception)
             {
+                // captura de errores en parsing o formato
                 return new ValidationResult(ErrorMessage ?? "El RUT no tiene un formato válido.");
             }
         }
