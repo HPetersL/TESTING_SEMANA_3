@@ -1,0 +1,262 @@
+﻿@model IEnumerable<ProyectoFichaMedica.Models.FichaMedica>
+@using System.Text.Json;
+
+@{
+    ViewData["Title"] = "Gestión de Ficha Médica";
+    // Recuperamos los datos de una ficha que colisionó para no perderlos y poder mostrarlos en el formulario de confirmación.
+    var fichaExistenteJson = TempData["FichaExistente"] as string;
+    FichaMedica? fichaExistente = !string.IsNullOrEmpty(fichaExistenteJson) ? JsonSerializer.Deserialize<FichaMedica>(fichaExistenteJson) : null;
+}
+
+<style>
+    .input-error {
+        border-color: #dc3545; /*color para bordes con datos incorrectos o null*/
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25); /*sombreado*/
+    }
+</style>
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+
+@if (TempData["MensajeExito"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["MensajeExito"]
+    </div>
+}
+@if (TempData["MensajeAlerta"] != null && fichaExistente != null)
+{
+    <div class="alert alert-warning" role="alert">
+        @TempData["MensajeAlerta"]
+        <form asp-action="Guardar" method="post" class="d-inline ms-3">
+            <input type="hidden" asp-for="@fichaExistente.Rut" />
+            <input type="hidden" asp-for="@fichaExistente.Nombres" />
+            <input type="hidden" asp-for="@fichaExistente.Apellidos" />
+            <input type="hidden" asp-for="@fichaExistente.Direccion" />
+            <input type="hidden" asp-for="@fichaExistente.Ciudad" />
+            <input type="hidden" asp-for="@fichaExistente.Telefono" />
+            <input type="hidden" asp-for="@fichaExistente.Email" />
+            <input type="hidden" asp-for="@fichaExistente.FechaNacimiento" />
+            <input type="hidden" asp-for="@fichaExistente.Sexo" />
+            <input type="hidden" asp-for="@fichaExistente.EstadoCivil" />
+            <input type="hidden" asp-for="@fichaExistente.Comentarios" />
+
+            <input type="hidden" name="sobrescribir" value="si" />
+            <button type="submit" class="btn btn-sm btn-success">Sí, Sobrescribir</button>
+            <a asp-action="Index" class="btn btn-sm btn-danger">No, Cancelar</a>
+        </form>
+    </div>
+}
+
+
+<div class="row">
+    <div class="col-md-6">
+        <h4>Ingresar o Modificar Registro</h4>
+        <form asp-action="Guardar" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-2">
+                <label asp-for="@(new FichaMedica().Rut)" class="control-label"></label>
+                <input asp-for="@(new FichaMedica().Rut)" class="form-control" title="Ingrese RUT sin puntos y con guión (ej: 12345678-K)." />
+                <span asp-validation-for="@(new FichaMedica().Rut)" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="@(new FichaMedica().Nombres)" class="control-label"></label>
+                <input asp-for="@(new FichaMedica().Nombres)" class="form-control"
+                       title="Este campo solo admite letras y espacios." />
+                <span asp-validation-for="@(new FichaMedica().Nombres)" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="@(new FichaMedica().Apellidos)" class="control-label"></label>
+                <input asp-for="@(new FichaMedica().Apellidos)" class="form-control" title="Este campo solo admite letras y espacios." />
+                <span asp-validation-for="@(new FichaMedica().Apellidos)" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="@(new FichaMedica().Direccion)" class="control-label"></label>
+                <input asp-for="@(new FichaMedica().Direccion)" class="form-control" title="Ingrese una dirección valida." />
+                <span asp-validation-for="@(new FichaMedica().Direccion)" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="@(new FichaMedica().Ciudad)" class="control-label"></label>
+                <input asp-for="@(new FichaMedica().Ciudad)" class="form-control" title="Este campo solo admite letras y espacios." />
+                <span asp-validation-for="@(new FichaMedica().Ciudad)" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="@(new FichaMedica().Telefono)" class="control-label"></label>
+                <input asp-for="@(new FichaMedica().Telefono)" class="form-control"
+                       placeholder="+56912345678"
+                       title="Ingrese el teléfono en formato +569xxxxxxxx." />
+                <span asp-validation-for="@(new FichaMedica().Telefono)" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="@(new FichaMedica().Email)" class="control-label"></label>
+                <input asp-for="@(new FichaMedica().Email)" class="form-control" title="Ingrese un email valido." />
+                <span asp-validation-for="@(new FichaMedica().Email)" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="@(new FichaMedica().FechaNacimiento)" class="control-label"></label>
+                <input asp-for="@(new FichaMedica().FechaNacimiento)" class="form-control"
+                       max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="@(new FichaMedica().FechaNacimiento)" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="@(new FichaMedica().Sexo)" class="control-label"></label>
+                <select asp-for="@(new FichaMedica().Sexo)" class="form-control" title="Seleccione una opción.">
+                    <option value="">-- Seleccionar --</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                    <option value="Prefiero no responder">Prefiero no responder</option>
+                </select>
+                <span asp-validation-for="@(new FichaMedica().Sexo)" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="@(new FichaMedica().EstadoCivil)" class="control-label"></label>
+                <select asp-for="@(new FichaMedica().EstadoCivil)" class="form-control">
+                    <option value="">-- Opcional --</option>
+                    <option value="Soltero(a)">Soltero(a)</option>
+                    <option value="Casado(a)">Casado(a)</option>
+                    <option value="Viudo(a)">Viudo(a)</option>
+                </select>
+                <span asp-validation-for="@(new FichaMedica().EstadoCivil)" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="@(new FichaMedica().Comentarios)" class="control-label"></label>
+                <textarea asp-for="@(new FichaMedica().Comentarios)" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="@(new FichaMedica().Comentarios)" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a asp-action="Index" class="btn btn-secondary">Limpiar</a>
+                <button type="button" id="btnCerrar" class="btn btn-danger">Cerrar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-md-6">
+        <h4>Buscar por Apellido</h4>
+        <form asp-action="Index" method="get" class="mb-3">
+            <div class="input-group">
+                <input type="text" name="apellidoBusqueda" class="form-control" placeholder="Ingrese apellido a buscar" value="@ViewData["ApellidoBusquedaActual"]">
+                <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+            </div>
+        </form>
+
+        @if (Model != null && Model.Any())
+        {
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.First().Nombres)</th>
+                        <th>@Html.DisplayNameFor(model => model.First().Apellidos)</th>
+                        <th>@Html.DisplayNameFor(model => model.First().Rut)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.Nombres)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Apellidos)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Rut)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else if (ViewData["ApellidoBusquedaActual"] != null)
+        {
+            <p>No se encontraron registros con el apellido proporcionado.</p>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var btnCerrar = document.getElementById('btnCerrar');
+            if(btnCerrar) {
+                btnCerrar.addEventListener('click', function() {
+                    if (confirm("¿Está seguro de que desea cerrar esta pestaña?")) {
+                        window.close();
+                    }
+                });
+            }
+
+            var rutInput = document.querySelector('input[name="@nameof(FichaMedica.Rut)"]');
+                    if(rutInput) {
+                        rutInput.addEventListener('input', function(e) {
+                            const input = e.target;
+
+                            // 1. Limpiar la entrada a solo números y K
+                            let valorLimpio = input.value.replace(/[^\dKk]/g, '');
+
+                            // 2. Validar la estructura en tiempo real
+                            // La estructura válida es: hasta 8 dígitos, seguidos opcionalmente por un dígito o K.
+                            // Esto previene entradas como "kkkk" o "123k45"
+                            let estructuraValida = /^\d{0,8}[Kk\d]?$/.test(valorLimpio);
+
+                            if (input.value.length > 0 && !estructuraValida) {
+                                // Si hay algo escrito pero la estructura no es válida, marcar como error.
+                                input.classList.add('input-error');
+                            } else {
+                                // Si la estructura es válida o el campo está vacío, quitar la marca de error.
+                                input.classList.remove('input-error');
+                            }
+
+                            // 3. Aplicar el formato visual (puntos y guion)
+                            if (valorLimpio.length > 1) {
+                                let cuerpo = valorLimpio.slice(0, -1);
+                                let dv = valorLimpio.slice(-1);
+
+                                // Usamos una expresión regular para insertar los puntos de miles
+                                cuerpo = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+                                input.value = cuerpo + '-' + dv;
+                            } else {
+                                input.value = valorLimpio;
+                            }
+                        });
+                    }
+            const soloLetrasPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/;
+
+            const camposParaValidar = document.querySelectorAll(
+                'input[name="@nameof(FichaMedica.Nombres)"],' +
+                'input[name="@nameof(FichaMedica.Apellidos)"],' +
+                'input[name="@nameof(FichaMedica.Ciudad)"]'
+            );
+
+            function validarCampoEnTiempoReal(event) {
+                const input = event.target;
+                const esValido = soloLetrasPattern.test(input.value);
+
+                if (esValido) {
+                    input.classList.remove('input-error');
+                } else {
+                    input.classList.add('input-error');
+                }
+            }
+
+            camposParaValidar.forEach(function(input) {
+                input.addEventListener('input', validarCampoEnTiempoReal);
+            });
+
+            const telefonoInput = document.querySelector('input[name="@nameof(FichaMedica.Telefono)"]');
+            if (telefonoInput) {
+                const soloNumerosYMasPattern = /^\+?[0-9]*$/;
+                telefonoInput.addEventListener('input', function(event) {
+                    const input = event.target;
+                    const esValido = soloNumerosYMasPattern.test(input.value);
+                        if (esValido) {
+                            input.classList.remove('input-error');
+                        } else {
+                            input.classList.add('input-error');
+                        }
+                });
+        }
+        });
+    </script>
+}
