@@ -185,42 +185,60 @@
                     }
                 });
             }
+            // nueva funcion para validar el rut chileno completamente
+            function validaRutChileno(rut) {
+                if (!rut || typeof rut !== 'string') return false;
+                
+                // limpiar y normalizar rut
+                rut = rut.toUpperCase().replace(/\./g, '').replace(/-/g, '');
+                
+                if (!/^\d{7,8}[0-9K]$/.test(rut)) return false;
+
+                const cuerpo = rut.slice(0, -1);
+                const dv = rut.slice(-1);
+                
+                let suma = 0;
+                let multiplo = 2;
+
+                for (let i = cuerpo.length - 1; i >= 0; i--) {
+                    suma += parseInt(cuerpo.charAt(i), 10) * multiplo;
+                    if (multiplo < 7) {
+                        multiplo++;
+                    } else {
+                        multiplo = 2;
+                    }
+                }
+
+                const dvEsperado = 11 - (suma % 11);
+                const dvCalculado = (dvEsperado === 11) ? '0' : (dvEsperado === 10) ? 'K' : dvEsperado.toString();
+
+                return dv === dvCalculado;
+            }
 
             var rutInput = document.querySelector('input[name="@nameof(FichaMedica.Rut)"]');
-                    if(rutInput) {
-                        rutInput.addEventListener('input', function(e) {
-                            const input = e.target;
-
-                            // 1. Limpiar la entrada a solo números y K
-                            let valorLimpio = input.value.replace(/[^\dKk]/g, '');
-
-                            // 2. Validar la estructura en tiempo real
-                            // La estructura válida es: hasta 8 dígitos, seguidos opcionalmente por un dígito o K.
-                            // Esto previene entradas como "kkkk" o "123k45"
-                            let estructuraValida = /^\d{0,8}[Kk\d]?$/.test(valorLimpio);
-
-                            if (input.value.length > 0 && !estructuraValida) {
-                                // Si hay algo escrito pero la estructura no es válida, marcar como error.
-                                input.classList.add('input-error');
-                            } else {
-                                // Si la estructura es válida o el campo está vacío, quitar la marca de error.
-                                input.classList.remove('input-error');
-                            }
-
-                            // 3. Aplicar el formato visual (puntos y guion)
-                            if (valorLimpio.length > 1) {
-                                let cuerpo = valorLimpio.slice(0, -1);
-                                let dv = valorLimpio.slice(-1);
-
-                                // Usamos una expresión regular para insertar los puntos de miles
-                                cuerpo = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-
-                                input.value = cuerpo + '-' + dv;
-                            } else {
-                                input.value = valorLimpio;
-                            }
-                        });
+            if(rutInput) {
+                rutInput.addEventListener('input', function(e) {
+                    const input = e.target;
+                    
+                    // Formatear la entrada visualmente (esto no cambia)
+                    let valorActual = input.value.replace(/[^\dKk]/g, '').toUpperCase();
+                    if (valorActual.length > 1) {
+                        let cuerpo = valorActual.slice(0, -1);
+                        let dv = valorActual.slice(-1);
+                        cuerpo = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                        input.value = cuerpo + '-' + dv;
+                    } else {
+                        input.value = valorActual;
                     }
+
+                    // Validar en tiempo real con el algoritmo completo
+                    if (input.value.length > 0 && !validaRutChileno(input.value)) {
+                        input.classList.add('input-error');
+                    } else {
+                        input.classList.remove('input-error');
+                    }
+                });
+            }
             const soloLetrasPattern = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/;
 
             const camposParaValidar = document.querySelectorAll(
